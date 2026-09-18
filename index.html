@@ -144,34 +144,20 @@
       gap: 14px;
     }
 
-    .section-label {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-weight: 700;
+    .instruction-box {
+      background: rgba(99, 102, 241, 0.08);
+      border-left: 4px solid var(--primary);
+      padding: 12px 16px;
+      border-radius: 12px;
       font-size: 0.95rem;
-    }
-
-    .presets {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .chip-btn {
-      background: rgba(99, 102, 241, 0.1);
-      border: 1px solid rgba(99, 102, 241, 0.25);
-      color: var(--primary);
-      padding: 4px 10px;
-      border-radius: 8px;
-      font-size: 0.78rem;
       font-weight: 600;
-      cursor: pointer;
+      line-height: 1.5;
+      color: var(--text-main);
     }
 
     textarea {
       width: 100%;
-      height: 190px;
+      height: 220px;
       padding: 16px;
       border: 2px solid rgba(148, 163, 184, 0.25);
       border-radius: 16px;
@@ -259,7 +245,7 @@
     .word:hover {
       background: var(--word-hover-bg);
       color: var(--word-hover-text);
-      transform: translateY(-2px scale(1.05));
+      transform: translateY(-2px) scale(1.05);
     }
 
     .word.active {
@@ -431,15 +417,11 @@
 
     <!-- EDİTÖR EKRANI -->
     <div id="editor-view" class="card editor-section">
-      <div class="section-label">
-        <span>Metin Girişi</span>
-        <div class="presets">
-          <button class="chip-btn" id="preset-1">🚀 Uzay Macerası</button>
-          <button class="chip-btn" id="preset-2">☕ Günlük Yaşam</button>
-        </div>
+      <div class="instruction-box">
+        💡 Buraya İngilizce metninizi yapıştırın, ardından <strong>"Okumayı Başlat"</strong> butonuna tıklayarak bilmediğiniz kelimelerin üzerine dokunun ve Türkçe anlamlarını anlık olarak öğrenin.
       </div>
 
-      <textarea id="text-input" placeholder="İngilizce metninizi buraya yapıştırın...">My little sister has a cute cat in our garden. We love playing together every day.</textarea>
+      <textarea id="text-input" placeholder="İngilizce metninizi buraya yapıştırın veya yazın..."></textarea>
       
       <button class="btn-launch" id="btn-start-reading">
         <span>📖</span> Okumayı Başlat
@@ -488,11 +470,6 @@
   </div>
 
   <script>
-    const presets = {
-      1: "The mysterious old clock in the town square suddenly stopped at midnight. Nobody knew that inside its golden gears, a tiny mechanical bird held a forgotten secret.",
-      2: "My little sister has a cute cat in our garden. We love playing together every morning."
-    };
-
     // DOM Öğeleri
     const editorView = document.getElementById('editor-view');
     const readerView = document.getElementById('reader-view');
@@ -547,15 +524,11 @@
       }
     });
 
-    // 3. Şablonlar
-    document.getElementById('preset-1').onclick = () => textInput.value = presets[1];
-    document.getElementById('preset-2').onclick = () => textInput.value = presets[2];
-
-    // 4. Okuma Modunu Başlat / Geri Dön
+    // 3. Okuma Modunu Başlat / Geri Dön
     btnStartReading.addEventListener('click', () => {
       const rawText = textInput.value.trim();
       if (!rawText) {
-        alert("Lütfen bir metin girin.");
+        alert("Lütfen önce bir İngilizce metin yapıştırın.");
         return;
       }
       renderInteractiveText(rawText);
@@ -570,7 +543,7 @@
       meaningCard.style.display = 'none';
     });
 
-    // 5. Metni Ayrıştırma
+    // 4. Metni Ayrıştırma
     function renderInteractiveText(text) {
       readingContent.innerHTML = '';
       const paragraphs = text.split(/\n+/);
@@ -605,7 +578,7 @@
       });
     }
 
-    // 6. Google Translate ile Kelime Çevirisi
+    // 5. Google Translate ile Kelime Çevirisi
     async function handleWordClick(rawWord) {
       const cleanWord = rawWord.toLowerCase().replace(/[^a-z0-9'-]/g, '');
       currentSelectedWord = cleanWord;
@@ -656,7 +629,7 @@
       }
     }
 
-    // 7. Sesli Telaffuz
+    // 6. Sesli Telaffuz
     btnSpeak.addEventListener('click', () => {
       speakWord(currentSelectedWord);
     });
@@ -669,7 +642,7 @@
       window.speechSynthesis.speak(utterance);
     }
 
-    // 8. Kelime Defteri İşlemleri
+    // 7. Kelime Defteri İşlemleri
     btnStar.addEventListener('click', () => {
       if (!currentSelectedWord || !currentSelectedMeaning) return;
 
