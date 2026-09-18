@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#4f46e5">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>VividReader Pro | İngilizce Okuma & Kelime Atölyesi</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Lora:ital,wght@0,500;1,400&display=swap" rel="stylesheet">
+
+  <link rel="manifest" href="data:application/manifest+json;utf-8,%7B%22name%22%3A%22VividReader%22%2C%22short_name%22%3A%22VividReader%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f8fafc%22%2C%22theme_color%22%3A%22%234f46e5%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Ffav.farm%2F%F0%9F%93%96%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fpng%22%7D%5D%7D">
+
+  <style>
+    :root {
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --accent: #f43f5e;
+      --accent-warm: #fbbf24;
+      --bg-gradient: linear-gradient(135deg, #f0fdf4 0%, #e0e7ff 50%, #fdf2f8 100%);
+      --card-bg: rgba(255, 255, 255, 0.94);
+      --card-border: rgba(255, 255, 255, 0.8);
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --word-hover-bg: #fde047;
+      --word-hover-text: #0f172a;
+      --shadow-lg: 0 20px 35px -8px rgba(99, 102, 241, 0.18), 0 8px 16px -4px rgba(0, 0, 0, 0.04);
+      --reader-font-size: 1.35rem;
+    }
+
+    body.dark-mode {
+      --bg-gradient: linear-gradient(135deg, #090d16 0%, #0f172a 50%, #1e1b4b 100%);
+      --card-bg: rgba(30, 41, 59, 0.85);
+      --card-border: rgba(255, 255, 255, 0.1);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --word-hover-bg: #fbbf24;
+      --word-hover-text: #090d16;
+      --shadow-lg: 0 20px 35px -8px rgba(0, 0, 0, 0.6);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      transition: background-color 0.25s ease, color 0.2s ease, border-color 0.2s ease;
+    }
+
+    body {
+      background: var(--bg-gradient);
+      min-height: 100vh;
+      color: var(--text-main);
+      padding: 16px 16px 80px 16px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 760px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .top-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 4px 8px;
+    }
+
+    .icon-btn {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      color: var(--text-main);
+      padding: 8px 14px;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    .icon-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    header {
+      text-align: center;
+      padding: 4px 0 10px;
+    }
+
+    .logo-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--card-bg);
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--primary);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      margin-bottom: 8px;
+      border: 1px solid var(--card-border);
+    }
+
+    header h1 {
+      font-size: 2.1rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: linear-gradient(120deg, #4f46e5, #d946ef, #f43f5e);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    header p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: var(--shadow-lg);
+      border: 1.5px solid var(--card-border);
+      position: relative;
+    }
+
+    .editor-section {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .section-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    .presets {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .chip-btn {
+      background: rgba(99, 102, 241, 0.1);
+      border: 1px solid rgba(99, 102, 241, 0.25);
+      color: var(--primary);
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    textarea {
+      width: 100%;
+      height: 190px;
+      padding: 16px;
+      border: 2px solid rgba(148, 163, 184, 0.25);
+      border-radius: 16px;
+      font-size: 1.05rem;
+      line-height: 1.7;
+      resize: vertical;
+      outline: none;
+      background: rgba(255, 255, 255, 0.4);
+      color: var(--text-main);
+    }
+
+    body.dark-mode textarea {
+      background: rgba(15, 23, 42, 0.6);
+    }
+
+    textarea:focus {
+      border-color: var(--primary);
+    }
+
+    .btn-launch {
+      background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+      color: white;
+      border: none;
+      padding: 15px 24px;
+      border-radius: 16px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 8px 20px -4px rgba(79, 70, 229, 0.4);
+    }
+
+    .reader-section {
+      display: none;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .reader-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 12px;
+      border-bottom: 1.5px dashed rgba(148, 163, 184, 0.3);
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .font-controls {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .font-btn {
+      background: rgba(148, 163, 184, 0.15);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      color: var(--text-main);
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .reading-content {
+      font-family: 'Lora', serif;
+      font-size: var(--reader-font-size);
+      line-height: 2.2;
+      user-select: none;
+    }
+
+    .word {
+      display: inline-block;
+      padding: 1px 4px;
+      margin: 0 1.5px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.16s ease;
+    }
+
+    .word:hover {
+      background: var(--word-hover-bg);
+      color: var(--word-hover-text);
+      transform: translateY(-2px scale(1.05));
+    }
+
+    .word.active {
+      background: #f59e0b !important;
+      color: #ffffff !important;
+      font-weight: 700;
+      transform: translateY(-2px) scale(1.08);
+      box-shadow: 0 6px 12px rgba(245, 158, 11, 0.4);
+    }
+
+    .meaning-card {
+      display: none;
+      position: sticky;
+      bottom: 16px;
+      background: linear-gradient(135deg, #18181b 0%, #27272a 100%);
+      color: white;
+      padding: 18px 22px;
+      border-radius: 20px;
+      box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.4), 0 0 0 2px rgba(255, 255, 255, 0.1);
+      animation: popUp 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      z-index: 10;
+    }
+
+    @keyframes popUp {
+      from { transform: translateY(30px) scale(0.95); opacity: 0; }
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+
+    .meaning-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .word-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .card-word {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: #fbbf24;
+    }
+
+    .btn-action-round {
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: white;
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      transition: all 0.2s;
+    }
+
+    .btn-action-round:hover {
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    .btn-star.saved {
+      background: #fbbf24;
+      color: #18181b;
+      border-color: #fbbf24;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      color: #a1a1aa;
+      font-size: 1.3rem;
+      cursor: pointer;
+    }
+
+    .meaning-body {
+      background: rgba(255, 255, 255, 0.07);
+      padding: 10px 14px;
+      border-radius: 10px;
+      border-left: 4px solid #38bdf8;
+    }
+
+    .meaning-text {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+      z-index: 100;
+      justify-content: center;
+      align-items: center;
+      padding: 16px;
+    }
+
+    .modal-card {
+      background: var(--card-bg);
+      width: 100%;
+      max-width: 520px;
+      max-height: 80vh;
+      border-radius: 20px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--card-border);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+      padding-bottom: 10px;
+    }
+
+    .vocab-list {
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding-right: 4px;
+    }
+
+    .vocab-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(148, 163, 184, 0.08);
+      padding: 10px 14px;
+      border-radius: 12px;
+    }
+
+    .vocab-item-text strong {
+      color: var(--primary);
+      font-size: 1.05rem;
+    }
+
+    .vocab-item-text p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="top-actions">
+      <button class="icon-btn" id="btn-open-vocab">⭐ Kelime Defterim (<span id="vocab-count">0</span>)</button>
+      <button class="icon-btn" id="btn-theme-toggle">🌙 Gece Modu</button>
+    </div>
+
+    <header>
+      <div class="logo-badge">✨ Akıllı Okuma Asistanı Pro</div>
+      <h1>VividReader</h1>
+      <p>İngilizce metninizi dilediğinizce okuyun, kelimeleri keşfedin ve kaydedin</p>
+    </header>
+
+    <!-- EDİTÖR EKRANI -->
+    <div id="editor-view" class="card editor-section">
+      <div class="section-label">
+        <span>Metin Girişi</span>
+        <div class="presets">
+          <button class="chip-btn" id="preset-1">🚀 Uzay Macerası</button>
+          <button class="chip-btn" id="preset-2">☕ Günlük Yaşam</button>
+        </div>
+      </div>
+
+      <textarea id="text-input" placeholder="İngilizce metninizi buraya yapıştırın...">My little sister has a cute cat in our garden. We love playing together every day.</textarea>
+      
+      <button class="btn-launch" id="btn-start-reading">
+        <span>📖</span> Okumayı Başlat
+      </button>
+    </div>
+
+    <!-- OKUMA EKRANI -->
+    <div id="reader-view" class="card reader-section">
+      <div class="reader-toolbar">
+        <button class="icon-btn" id="btn-back">← Yeni Metin</button>
+        <div class="font-controls">
+          <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 700;">Yazı:</span>
+          <button class="font-btn" id="btn-font-dec">A-</button>
+          <button class="font-btn" id="btn-font-inc">A+</button>
+        </div>
+      </div>
+
+      <div id="reading-content" class="reading-content"></div>
+
+      <!-- Alt Anlam Kartı -->
+      <div id="meaning-card" class="meaning-card">
+        <div class="meaning-header">
+          <div class="word-group">
+            <span class="card-word" id="card-word">-</span>
+            <button class="btn-action-round" id="btn-speak" title="Telaffuz Dinle">🔊</button>
+            <button class="btn-action-round btn-star" id="btn-star" title="Kelime Defterine Ekle">⭐</button>
+          </div>
+          <button class="close-btn" id="btn-close-card">✕</button>
+        </div>
+        <div class="meaning-body">
+          <div class="meaning-text" id="card-meaning">Anlam yükleniyor...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KELİME DEFTERİ MODALI -->
+  <div class="modal-overlay" id="vocab-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>⭐ Kelime Defterim</h3>
+        <button class="close-btn" id="btn-close-vocab" style="color: var(--text-muted);">✕</button>
+      </div>
+      <div class="vocab-list" id="vocab-list-content"></div>
+    </div>
+  </div>
+
+  <script>
+    const presets = {
+      1: "The mysterious old clock in the town square suddenly stopped at midnight. Nobody knew that inside its golden gears, a tiny mechanical bird held a forgotten secret.",
+      2: "My little sister has a cute cat in our garden. We love playing together every morning."
+    };
+
+    // DOM Öğeleri
+    const editorView = document.getElementById('editor-view');
+    const readerView = document.getElementById('reader-view');
+    const textInput = document.getElementById('text-input');
+    const btnStartReading = document.getElementById('btn-start-reading');
+    const btnBack = document.getElementById('btn-back');
+    const readingContent = document.getElementById('reading-content');
+    
+    const meaningCard = document.getElementById('meaning-card');
+    const cardWord = document.getElementById('card-word');
+    const cardMeaning = document.getElementById('card-meaning');
+    const btnSpeak = document.getElementById('btn-speak');
+    const btnStar = document.getElementById('btn-star');
+    const btnCloseCard = document.getElementById('btn-close-card');
+
+    const btnThemeToggle = document.getElementById('btn-theme-toggle');
+    const btnFontInc = document.getElementById('btn-font-inc');
+    const btnFontDec = document.getElementById('btn-font-dec');
+
+    const btnOpenVocab = document.getElementById('btn-open-vocab');
+    const btnCloseVocab = document.getElementById('btn-close-vocab');
+    const vocabModal = document.getElementById('vocab-modal');
+    const vocabListContent = document.getElementById('vocab-list-content');
+    const vocabCount = document.getElementById('vocab-count');
+
+    let currentSelectedWord = "";
+    let currentSelectedMeaning = "";
+    let currentFontSizeRem = 1.35;
+
+    let savedVocab = JSON.parse(localStorage.getItem('vivid_vocab') || '[]');
+    updateVocabCount();
+
+    // 1. Tema Değiştirme
+    btnThemeToggle.addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+      const isDark = document.body.classList.contains('dark-mode');
+      btnThemeToggle.textContent = isDark ? '☀️ Gündüz Modu' : '🌙 Gece Modu';
+    });
+
+    // 2. Font Boyutu
+    btnFontInc.addEventListener('click', () => {
+      if (currentFontSizeRem < 2.2) {
+        currentFontSizeRem += 0.15;
+        readingContent.style.setProperty('--reader-font-size', `${currentFontSizeRem}rem`);
+      }
+    });
+
+    btnFontDec.addEventListener('click', () => {
+      if (currentFontSizeRem > 1.0) {
+        currentFontSizeRem -= 0.15;
+        readingContent.style.setProperty('--reader-font-size', `${currentFontSizeRem}rem`);
+      }
+    });
+
+    // 3. Şablonlar
+    document.getElementById('preset-1').onclick = () => textInput.value = presets[1];
+    document.getElementById('preset-2').onclick = () => textInput.value = presets[2];
+
+    // 4. Okuma Modunu Başlat / Geri Dön
+    btnStartReading.addEventListener('click', () => {
+      const rawText = textInput.value.trim();
+      if (!rawText) {
+        alert("Lütfen bir metin girin.");
+        return;
+      }
+      renderInteractiveText(rawText);
+      editorView.style.display = 'none';
+      readerView.style.display = 'flex';
+      meaningCard.style.display = 'none';
+    });
+
+    btnBack.addEventListener('click', () => {
+      readerView.style.display = 'none';
+      editorView.style.display = 'flex';
+      meaningCard.style.display = 'none';
+    });
+
+    // 5. Metni Ayrıştırma
+    function renderInteractiveText(text) {
+      readingContent.innerHTML = '';
+      const paragraphs = text.split(/\n+/);
+
+      paragraphs.forEach(para => {
+        const pElement = document.createElement('p');
+        pElement.style.marginBottom = '20px';
+
+        const tokens = para.split(/(\s+|[.,!?;:()"])/);
+
+        tokens.forEach(token => {
+          if (!token) return;
+
+          if (/[\w'-]+/.test(token)) {
+            const span = document.createElement('span');
+            span.className = 'word';
+            span.textContent = token;
+
+            span.addEventListener('click', () => {
+              document.querySelectorAll('.word.active').forEach(el => el.classList.remove('active'));
+              span.classList.add('active');
+              handleWordClick(token);
+            });
+
+            pElement.appendChild(span);
+          } else {
+            pElement.appendChild(document.createTextNode(token));
+          }
+        });
+
+        readingContent.appendChild(pElement);
+      });
+    }
+
+    // 6. Google Translate ile Kelime Çevirisi
+    async function handleWordClick(rawWord) {
+      const cleanWord = rawWord.toLowerCase().replace(/[^a-z0-9'-]/g, '');
+      currentSelectedWord = cleanWord;
+
+      cardWord.textContent = rawWord;
+      cardMeaning.textContent = "Google Translate ile çevriliyor...";
+      meaningCard.style.display = 'block';
+
+      try {
+        const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=tr&dt=t&dt=bd&q=${encodeURIComponent(cleanWord)}`;
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (data && data[0] && data[0][0] && data[0][0][0]) {
+          let mainMeaning = data[0][0][0].toLowerCase();
+          
+          let altMeanings = [];
+          if (data[1]) {
+            data[1].forEach(posGroup => {
+              if (posGroup[1]) {
+                altMeanings.push(...posGroup[1].slice(0, 2));
+              }
+            });
+          }
+
+          const uniqueMeanings = Array.from(new Set([mainMeaning, ...altMeanings])).slice(0, 3);
+          currentSelectedMeaning = uniqueMeanings.join(', ');
+          
+          cardMeaning.textContent = currentSelectedMeaning;
+        } else {
+          cardMeaning.textContent = "Anlam bulunamadı.";
+        }
+      } catch (error) {
+        fallbackTranslate(cleanWord);
+      }
+
+      updateStarButtonState();
+    }
+
+    async function fallbackTranslate(word) {
+      try {
+        const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(word)}&langpair=en|tr`);
+        const d = await res.json();
+        currentSelectedMeaning = (d?.responseData?.translatedText || "Anlam bulunamadı").toLowerCase();
+        cardMeaning.textContent = currentSelectedMeaning;
+      } catch (e) {
+        cardMeaning.textContent = "Bağlantı hatası (İnterneti kontrol edin).";
+      }
+    }
+
+    // 7. Sesli Telaffuz
+    btnSpeak.addEventListener('click', () => {
+      speakWord(currentSelectedWord);
+    });
+
+    function speakWord(word) {
+      if (!word) return;
+      const utterance = new SpeechSynthesisUtterance(word);
+      utterance.lang = 'en-US';
+      utterance.rate = 0.85;
+      window.speechSynthesis.speak(utterance);
+    }
+
+    // 8. Kelime Defteri İşlemleri
+    btnStar.addEventListener('click', () => {
+      if (!currentSelectedWord || !currentSelectedMeaning) return;
+
+      const existingIndex = savedVocab.findIndex(item => item.word === currentSelectedWord);
+      if (existingIndex > -1) {
+        savedVocab.splice(existingIndex, 1);
+      } else {
+        savedVocab.unshift({ word: currentSelectedWord, meaning: currentSelectedMeaning });
+      }
+
+      localStorage.setItem('vivid_vocab', JSON.stringify(savedVocab));
+      updateStarButtonState();
+      updateVocabCount();
+    });
+
+    function updateStarButtonState() {
+      const isSaved = savedVocab.some(item => item.word === currentSelectedWord);
+      if (isSaved) {
+        btnStar.classList.add('saved');
+      } else {
+        btnStar.classList.remove('saved');
+      }
+    }
+
+    function updateVocabCount() {
+      vocabCount.textContent = savedVocab.length;
+    }
+
+    btnOpenVocab.addEventListener('click', () => {
+      renderVocabList();
+      vocabModal.style.display = 'flex';
+    });
+
+    btnCloseVocab.addEventListener('click', () => {
+      vocabModal.style.display = 'none';
+    });
+
+    function renderVocabList() {
+      vocabListContent.innerHTML = '';
+      if (savedVocab.length === 0) {
+        vocabListContent.innerHTML = '<p style="text-align:center; color: var(--text-muted); padding: 20px;">Henüz kaydedilmiş kelime yok.</p>';
+        return;
+      }
+
+      savedVocab.forEach((item, index) => {
+        const div = document.createElement('div');
+        div.className = 'vocab-item';
+        div.innerHTML = `
+          <div class="vocab-item-text">
+            <strong>${item.word}</strong>
+            <p>${item.meaning}</p>
+          </div>
+          <div style="display: flex; gap: 6px;">
+            <button class="icon-btn" onclick="speakWord('${item.word}')" style="padding: 6px 10px;">🔊</button>
+            <button class="icon-btn" onclick="deleteVocabItem(${index})" style="padding: 6px 10px; color: #f43f5e;">🗑️</button>
+          </div>
+        `;
+        vocabListContent.appendChild(div);
+      });
+    }
+
+    window.deleteVocabItem = function(index) {
+      savedVocab.splice(index, 1);
+      localStorage.setItem('vivid_vocab', JSON.stringify(savedVocab));
+      renderVocabList();
+      updateVocabCount();
+      updateStarButtonState();
+    };
+
+    btnCloseCard.addEventListener('click', () => {
+      meaningCard.style.display = 'none';
+      document.querySelectorAll('.word.active').forEach(el => el.classList.remove('active'));
+    });
+  </script>
+</body>
+</html>
